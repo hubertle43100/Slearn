@@ -3,8 +3,17 @@ protocol CanFly {
     func fly() // can't have '{ }' in protocol
 }
 
+extension CanFly {
+    func fly() {
+        print("The object takes off into the air.")
+    }
+}
 
 class Bird {
+    
+    func fly(){
+        print("The bird takes off into the air.")
+    }
     
     var isFemale = true
     
@@ -20,9 +29,9 @@ class Bird {
 }
 
 class Eagle: Bird, CanFly {
-    func fly() {
-        print("The bird flaps its wings and lifts off into the sky.")
-    }
+//    func fly() {
+//        print("The bird flaps its wings and lifts off into the sky.")
+//    }
     
     
     func soar(){
@@ -46,9 +55,9 @@ struct FlyingMuseum {
     
 //Proctcol can be inherit by struct and classes
 struct Airplane: CanFly{ //changed back to a struct
-    func fly() { //OVERRIDE: force override (headache are given b/c it inherits bird
-        print("The airplane uses its engine to lift off into the air.")
-    }
+//    func fly() { //OVERRIDE: force override (headache are given b/c it inherits bird
+//        print("The airplane uses its engine to lift off into the air.")
+//    }
 }
 
 let myEagle = Eagle()
