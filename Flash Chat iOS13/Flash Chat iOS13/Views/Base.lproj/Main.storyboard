@@ -367,11 +367,11 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lRG-6v-3by" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-86.956521739130437" y="134.59821428571428"/>
+            <point key="canvasLocation" x="-171" y="135"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="mxe-CQ-Tgp"/>
+        <segue reference="hsx-0p-xFX"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="paperplane.fill" catalog="system" width="128" height="121"/>
