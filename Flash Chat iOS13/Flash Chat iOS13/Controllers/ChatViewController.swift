@@ -23,6 +23,7 @@ class ChatViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //tableView.delegate = self
         tableView.dataSource = self
         
         //deleting back button...
@@ -30,6 +31,9 @@ class ChatViewController: UIViewController {
         
         //adding title...
         title = K.appName
+        
+        //register xib file
+        tableView.register(UINib(nibName: K.cellNibName, bundle: nil), forCellReuseIdentifier: K.cellIdentifier)
 
     }
     
@@ -59,10 +63,14 @@ extension ChatViewController: UITableViewDataSource {
     
     //this method is going to run 3 times: 3 items in message array
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: K.cellIdentifier, for: indexPath)
-        cell.textLabel?.text = "this is a cell"
+        let cell = tableView.dequeueReusableCell(withIdentifier: K.cellIdentifier, for: indexPath) as! MessageCell
+        cell.label.text = messages[indexPath.row].body
         return cell
     }
-    
-    
 }
+
+//extension ChatViewController: UITableViewDelegate {
+//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        print(indexPath.row)
+//    }
+//}
