@@ -13,6 +13,18 @@ class WelcomeViewController: UIViewController {
     //change UILabel --> CLTypingLabel
     @IBOutlet weak var titleLabel: CLTypingLabel!
     
+    //hide navigation bar
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated) //good habit to call super
+        navigationController?.isNavigationBarHidden = true
+    }
+    //got to unhide the navigation bar
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.isNavigationBarHidden = false
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
