@@ -6,53 +6,62 @@
 //  Copyright © 2019 App Brewery. All rights reserved.
 //
 
+
+//encoding --> takes music and turns it into a vinyl disc
+//decoding --> turning vinyl disc into music
+
 import UIKit
 
 class ToDoListViewController: UITableViewController {
     //changing array so "let" --> "var"
 //    var itemArray = ["Find Mike", "Buy eggos", "Destory Demogorgon","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p"]
     var itemArray = [Item]()
-    let defaults = UserDefaults.standard
+    //let defaults = UserDefaults.standard
 
+    //make this a global variable
+    //endcode / decode file path for the plist --> convert array of items in plist
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
-        print(dataFilePath)
+        //print(dataFilePath)
         
-        let newItem = Item()
-        newItem.title = "Find Mike"
-        itemArray.append(newItem)
-        
-        let newItem2 = Item()
-        newItem2.title = "Buy Eggos"
-        itemArray.append(newItem2)
-        
-        let newItem3 = Item()
-        newItem3.title = "Destroy Demogorgon"
-        itemArray.append(newItem3)
-        
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
+//        let newItem = Item()
+//        newItem.title = "Find Mike"
+//        itemArray.append(newItem)
+//
+//        let newItem2 = Item()
+//        newItem2.title = "Buy Eggos"
+//        itemArray.append(newItem2)
+//
+//        let newItem3 = Item()
+//        newItem3.title = "Destroy Demogorgon"
 //        itemArray.append(newItem3)
         
-        if let items = defaults.array(forKey: "ToDoListArray") as? [Item] {
-            itemArray = items
-        }
+//        itemArray.append(newItem3)
+//        itemArray.append(newItem3)
+//        itemArray.append(newItem3)
+//        itemArray.append(newItem3)
+//        itemArray.append(newItem3)
+//        itemArray.append(newItem3)
+//        itemArray.append(newItem3)
+//        itemArray.append(newItem3)
+//        itemArray.append(newItem3)
+//        itemArray.append(newItem3)
+//        itemArray.append(newItem3)
+//        itemArray.append(newItem3)
+//        itemArray.append(newItem3)
+//        itemArray.append(newItem3)
+//        itemArray.append(newItem3)
+//        itemArray.append(newItem3)
+        
+//        if let items = defaults.array(forKey: "ToDoListArray") as? [Item] {
+//            itemArray = items
+//        }
         // Do any additional setup after loading the view.
+        
+        loadItems()
     }
     
 //    override func didReceiveMemoryWarning() {
@@ -103,6 +112,8 @@ class ToDoListViewController: UITableViewController {
         
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done //this line replaces the if statement below
         
+        saveItem()
+        
 //        if itemArray[indexPath.row].done == false {
 //            itemArray[indexPath.row].done = true
 //        } else {
@@ -115,7 +126,7 @@ class ToDoListViewController: UITableViewController {
 //            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
 //        }
         
-        tableView.reloadData() //forces the tableView to call data sources --> reload data
+        //tableView.reloadData() //forces the tableView to call data sources --> reload data
     
         tableView.deselectRow(at: indexPath, animated: true)
         
@@ -140,10 +151,10 @@ class ToDoListViewController: UITableViewController {
             
             self.itemArray.append(newItem)
             
+            self.saveItem()
             //only should be using defaults for small amount of data
-            self.defaults.set(self.itemArray, forKey: "TodoListArray")
+            //self.defaults.set(self.itemArray, forKey: "TodoListArray")
             
-            self.tableView.reloadData()
         }
         
         //only triggers when someone adds something to their list
@@ -161,5 +172,30 @@ class ToDoListViewController: UITableViewController {
         
     }
     
+    //MARK - Model Manipulation Methods
+    func saveItem() {
+        let encoder = PropertyListEncoder()
+        do {
+            //encoding data
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilePath!)
+        } catch {
+            print("Error encoding item array, \(error)")
+        }
+        
+        self.tableView.reloadData()
+    }
+    
+    func loadItems() {
+        //using optional binding
+        if let data = try? Data(contentsOf: dataFilePath!) {
+            let decoder = PropertyListDecoder()
+            do {
+                itemArray = try decoder.decode([Item].self, from: data)
+            } catch {
+                print("Error decoding item array, \(error)")
+            }
+        }
+    }
 }
 

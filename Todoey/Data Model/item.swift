@@ -8,7 +8,7 @@
 
 import Foundation
 
-class Item {
+class Item: Codable { //can encode itself into a plist
     var title: String = ""
     var done: Bool = false
 }
