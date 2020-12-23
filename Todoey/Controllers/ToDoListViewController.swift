@@ -21,12 +21,14 @@ class ToDoListViewController: UITableViewController {
 
     //make this a global variable
     //endcode / decode file path for the plist --> convert array of items in plist
-    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+   // let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)) //path where data is stored
         
         //print(dataFilePath)
         
@@ -64,7 +66,7 @@ class ToDoListViewController: UITableViewController {
 //        }
         // Do any additional setup after loading the view.
         
-        //loadItems()
+        loadItems()
     }
     
 //    override func didReceiveMemoryWarning() {
@@ -72,7 +74,7 @@ class ToDoListViewController: UITableViewController {
 //        //Dispose of any resources that can be recreated
 //    }
     
-    //MARK - TableviewDatasource Methods
+    //MARK: - TableviewDatasource Methods
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return itemArray.count
@@ -106,13 +108,18 @@ class ToDoListViewController: UITableViewController {
         return cell
     }
     
-    //MARK - TableView Delegates Methods
+    //MARK: - TableView Delegates Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //print(itemArray[indexPath.row])  -->  # row that was selected --> name selected
         
         //tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
         
+        
+//        context.delete(itemArray[indexPath.row])//remove data from persist container
+//        itemArray.remove(at: indexPath.row) //update item array
+        
+        // itemArray[indexPath.row].setValue("Completed", forKey: "title")
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done //this line replaces the if statement below
         
         saveItem()
@@ -136,7 +143,7 @@ class ToDoListViewController: UITableViewController {
         
     }
 
-    //MARK - Add New Items
+    //MARK: - Add New Items
     
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
@@ -179,7 +186,7 @@ class ToDoListViewController: UITableViewController {
         
     }
     
-    //MARK - Model Manipulation Methods
+    //MARK: - Model Manipulation Methods
     func saveItem() {
         let encoder = PropertyListEncoder()
         do {
@@ -195,8 +202,8 @@ class ToDoListViewController: UITableViewController {
         self.tableView.reloadData()
     }
     
-//    func loadItems() {
-//        //using optional binding
+    func loadItems() {
+        //using optional binding
 //        if let data = try? Data(contentsOf: dataFilePath!) {
 //            let decoder = PropertyListDecoder()
 //            do {
@@ -205,6 +212,36 @@ class ToDoListViewController: UITableViewController {
 //                print("Error decoding item array, \(error)")
 //            }
 //        }
-//    }
+        
+        //must specify the data type
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        do {
+            itemArray = try context.fetch(request)
+        } catch {
+            print("Error fetching data from contex \(error)")
+        }
+    }
+}
+//MARK: - Search bar methods
+extension ToDoListViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let request: NSFetchRequest<Item> = Item.fetchRequest()
+        
+        //print(searchBar.text! )
+        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        
+        request.predicate = predicate
+        
+        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
+        
+        request.sortDescriptors = [sortDescriptor]
+        do {
+            itemArray = try context.fetch(request)
+        } catch {
+            print("Error fetching data from contex \(error)")
+        }
+        
+        tableView.reloadData()
+    }
 }
 
