@@ -17,6 +17,12 @@ class ToDoListViewController: UITableViewController {
     //changing array so "let" --> "var"
 //    var itemArray = ["Find Mike", "Buy eggos", "Destory Demogorgon","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p"]
     var itemArray = [Item]()
+    
+    var selectedCategory: Category? {
+        didSet{ //triggers when there is a value for Category
+            loadItems()
+        }
+    }
     //let defaults = UserDefaults.standard
 
     //make this a global variable
@@ -65,8 +71,10 @@ class ToDoListViewController: UITableViewController {
 //            itemArray = items
 //        }
         // Do any additional setup after loading the view.
+        //let request : NSFetchRequest<Item> = Item.fetchRequest()
         
-        loadItems()
+        //loadItems(with: request)
+        //loadItems()
     }
     
 //    override func didReceiveMemoryWarning() {
@@ -163,6 +171,7 @@ class ToDoListViewController: UITableViewController {
             let newItem = Item(context: self.context)
             newItem.title = textField.text!
             newItem.done = false //it is not optional is needs a value
+            newItem.parentCategory = self.selectedCategory
             self.itemArray.append(newItem)
             
             self.saveItem()
@@ -202,7 +211,8 @@ class ToDoListViewController: UITableViewController {
         self.tableView.reloadData()
     }
     
-    func loadItems() {
+    //has external and internal parameter
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
         //using optional binding
 //        if let data = try? Data(contentsOf: dataFilePath!) {
 //            let decoder = PropertyListDecoder()
@@ -214,7 +224,7 @@ class ToDoListViewController: UITableViewController {
 //        }
         
         //must specify the data type
-        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        //let request : NSFetchRequest<Item> = Item.fetchRequest()
         do {
             itemArray = try context.fetch(request)
         } catch {
@@ -228,20 +238,30 @@ extension ToDoListViewController: UISearchBarDelegate {
         let request: NSFetchRequest<Item> = Item.fetchRequest()
         
         //print(searchBar.text! )
-        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
         
-        request.predicate = predicate
+//        request.predicate = predicate
         
-        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
         
-        request.sortDescriptors = [sortDescriptor]
-        do {
-            itemArray = try context.fetch(request)
-        } catch {
-            print("Error fetching data from contex \(error)")
+        loadItems(with: request)
+        //request.sortDescriptors = [sortDescriptor]
+//        do {
+//            itemArray = try context.fetch(request)
+//        } catch {
+//            print("Error fetching data from contex \(error)")
+//        }
+        
+        //tableView.reloadData()
+    }
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+            //searchBar.resignFirstResponder()
         }
-        
-        tableView.reloadData()
     }
 }
 
