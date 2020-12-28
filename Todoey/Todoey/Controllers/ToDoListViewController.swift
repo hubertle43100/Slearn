@@ -24,6 +24,7 @@ class ToDoListViewController: UITableViewController {
     }
     
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+                    //^ singleton
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,9 +41,6 @@ class ToDoListViewController: UITableViewController {
     
     //how we should display all of the cells
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        //let cell = UITableViewCell(style: .default, reuseIdentifier: "ToDoItemCell")
-        
-        //print("cellForRowAtIndexPath Called")
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
         
@@ -84,6 +82,7 @@ class ToDoListViewController: UITableViewController {
                    
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             
+            //commiting CRUD to our context --> persistent container
             let newItem = Item(context: self.context)
             newItem.title = textField.text!
             newItem.done = false //it is not optional is needs a value
@@ -121,10 +120,20 @@ class ToDoListViewController: UITableViewController {
     }
     
     //has external and internal parameter
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {//can load items without parameters b/c it has default values
         
         //must specify the data type
         //let request : NSFetchRequest<Item> = Item.fetchRequest()
+        
+        //overrides the other (request.predicate) that we have below --> goes to new Item list
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!) //parent name needs to match up with the selected cell
+        
+        //used optional binding to create this (unwrapping a nil value)
+        if let additionPredicate = predicate {
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionPredicate])
+        } else {
+            request.predicate = categoryPredicate
+        }
         
         do {
             itemArray = try context.fetch(request)
@@ -137,16 +146,23 @@ class ToDoListViewController: UITableViewController {
 
 
 //MARK: - Search bar methods
-extension ToDoListViewController: UISearchBarDelegate {
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+extension ToDoListViewController: UISearchBarDelegate { //help separate functionality
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) { //only triggers when "enter" button is pressed
+        
+        //initlize a request
         let request: NSFetchRequest<Item> = Item.fetchRequest()
         
-        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        //how to add filter\query our data
+        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+                                        //^ title must contain what is currently in the search bar
         
+        //sorting the Data in Alphabetical order
         request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
         
-        loadItems(with: request)
+        //run loadItems with the request
+        loadItems(with: request, predicate: predicate)
     }
+    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchBar.text?.count == 0 {
             loadItems()
