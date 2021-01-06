@@ -7,3 +7,13 @@
 //
 
 import Foundation
+import RealmSwift
+
+class Category: Object {
+    @objc dynamic var name: String = ""
+    let items = List<Item>()
+    //let array = [1,2,3]
+    //let array : [Int] = [1,2,3]
+    //let array = Array<Item> = [1,2,3]
+    //let array = Array<Item>()
+}
