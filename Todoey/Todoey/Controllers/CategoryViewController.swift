@@ -11,12 +11,13 @@ import RealmSwift
 
 class CategoryViewController: UITableViewController {
     
+                //try! == code smell (not an issue)
     let realm = try! Realm() //initlizing realm ...
     
 //    var categories = [Category]()
     var categories: Results<Category>?
     
-//    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,9 +71,9 @@ class CategoryViewController: UITableViewController {
     func loadCategories() {
         
         //pulls out objects from realm that is type 'Category'
-        categories = realm.objects(Category.self)
-        
-        tableView.reloadData()
+//        categories = realm.objects(Category.self)
+//        
+//        tableView.reloadData()
     }
     
     //MARK: - Add New Categories
