@@ -62,7 +62,7 @@ class ToDoListViewController: UITableViewController {
 //        cell.textLabel?.text = item.title
 //
 //        //turnary operator -->
-//        //value = condition ? valueIfTrue : valueIfFalse
+//        value = condition ? valueIfTrue : valueIfFalse
 //        cell.accessoryType = item.done ? .checkmark : .none
         
         return cell
@@ -113,6 +113,7 @@ class ToDoListViewController: UITableViewController {
                     try self.realm.write { //saving...
                         let newItem = Item() //create item
                         newItem.title = textField.text! //give item a name
+                        newItem.dateCreated = Date()
                         currentCategory.items.append(newItem) //add it to the list
                     }
                 } catch {
@@ -159,28 +160,10 @@ class ToDoListViewController: UITableViewController {
 //    }
     
     //has external and internal parameter
-    func loadItems() { //with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {//can load items without parameters b/c it has default values
+    func loadItems() {
         
+        //looks at item and pulls it out in acending order
         todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
-
-//       // must specify the data type
-//        let request : NSFetchRequest<Item> = Item.fetchRequest()
-//
-//        //overrides the other (request.predicate) that we have below --> goes to new Item list
-//        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!) //parent name needs to match up with the selected cell
-//
-//        //used optional binding to create this (unwrapping a nil value)
-//        if let additionPredicate = predicate {
-//            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionPredicate])
-//        } else {
-//            request.predicate = categoryPredicate
-//        }
-//
-//        do {
-//            itemArray = try context.fetch(request)
-//        } catch {
-//            print("Error fetching data from contex \(error)")
-//        }
         
         tableView.reloadData()
     }
@@ -189,31 +172,24 @@ class ToDoListViewController: UITableViewController {
 
 
 //MARK: - Search bar methods
-//extension ToDoListViewController: UISearchBarDelegate { //help separate functionality
-//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) { //only triggers when "enter" button is pressed
-//
-//        //initlize a request
-//        let request: NSFetchRequest<Item> = Item.fetchRequest()
-//
-//        //how to add filter\query our data
-//        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-//                                        //^ title must contain what is currently in the search bar
-//
-//        //sorting the Data in Alphabetical order
-//        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-//
-//        //run loadItems with the request
-//        loadItems(with: request, predicate: predicate)
-//    }
-//
-//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//        if searchBar.text?.count == 0 {
-//            loadItems()
-//            DispatchQueue.main.async {
-//                searchBar.resignFirstResponder()
-//            }
-//        }
-//    }
-//}
-//
+extension ToDoListViewController: UISearchBarDelegate { //help separate functionality
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) { //only triggers when "enter" button is pressed
+
+        //query realm data...
+        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true) //todoItem is the word typed into the searchBar
+        
+        tableView.reloadData()
+    }
+
+    //this triggers when we dissmiss the search bar
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 { //when there is nothing in the searchBar
+            loadItems()
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+        }
+    }
+}
+
 
