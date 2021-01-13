@@ -10,85 +10,95 @@ import UIKit
 import RealmSwift
 
 class CategoryViewController: UITableViewController {
-    
-                //try! == code smell (not an issue)
+             //try! == code smell (not an issue)
     let realm = try! Realm() //initlizing realm ...
     
-//    var categories = [Category]()
-    var categories: Results<Category>?
-    
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    //collection of Results(of category "Object")
+    var categories: Results<Category>? //optional? --> to be safe
 
-    override func viewDidLoad() {
+    override func viewDidLoad() { //first thing that happens when loading up the app
         super.viewDidLoad()
-
         loadCategories()
     }
     
+    
+    
+    
+    
     //MARK: - TableView Datasource Methods
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    //.reloadData() --> calls function
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { //return #s of Rows
         return categories?.count ?? 1 //NIL coalescing Operator (if nil then return 1)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
         
+        //cell will look at location of cell if there is a category --> then fills up the cell (if NIL then print "")
         cell.textLabel?.text = categories?[indexPath.row].name ?? "No Category added yet"
         
         return cell
     }
     
+    
+    
+    
+    
+    
     //MARK: - TableView Delegate Methods
+    //when a cell has been clicked --> call this function
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: "goToItems", sender: self) // do a seqgue from Category to ToDoList
     }
     
     //before going to the next screen (segue) we would execute this
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let destinationVC = segue.destination as! ToDoListViewController
+        let destinationVC = segue.destination as! ToDoListViewController //creating new instance...
         
         if let indexPath = tableView.indexPathForSelectedRow { //know what row is selected (put in if statement just in case)
-            destinationVC.selectedCategory = categories?[indexPath.row]
+            destinationVC.selectedCategory = categories?[indexPath.row] //send the category & its row #
         }
     }
     
-    //MARK: - Data Manipulation Methods
     
+    
+    
+    
+    //MARK: - Data Manipulation Methods
+            //pass in the new category that just add using <-- 'addButtonPressed'
     func save(category: Category) {
-        do{
-           //try context.save()
-            try realm.write {
-                realm.add(category)
+        do {
+            try realm.write { //commiting to realm...
+                realm.add(category) //if there anything to change
             }
         } catch {
             print("Error while saving \(error)")
         }
-        
         tableView.reloadData()
     }
     
     func loadCategories() {
-        
         //pulls out objects from realm that is type 'Category'
-//        categories = realm.objects(Category.self)
-//        
-//        tableView.reloadData()
+        categories = realm.objects(Category.self)
+        
+        tableView.reloadData()
     }
     
-    //MARK: - Add New Categories
     
-    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+    
+    
+    
+    //MARK: - Add New Categories
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) { //calls function when '+' button is pressed
         var textField = UITextField()
         
+        //^ pops up an alert ^
         let alert = UIAlertController(title: "Add New Category", message: "", preferredStyle: .alert)
         
-        let action = UIAlertAction(title: "Add", style: .default) { (action) in
+        let action = UIAlertAction(title: "Add", style: .default) { (action) in //if 'add' button is pressed in alert then -->
             let newCategory = Category() //Category is straight up object
             newCategory.name = textField.text! //text in UIAlert
-            
-//            self.categories.append(newCategory)
-            
             self.save(category: newCategory)
         }
         alert.addAction(action)

@@ -9,11 +9,8 @@
 import Foundation
 import RealmSwift
 
-class Category: Object {
+class Category: Object { //subclass of the Realm Object
+    //dynamic fits into runtime/buildtime
     @objc dynamic var name: String = ""
-    let items = List<Item>()
-    //let array = [1,2,3]
-    //let array : [Int] = [1,2,3]
-    //let array = Array<Item> = [1,2,3]
-    //let array = Array<Item>()
+    let items = List<Item>() //category has an item which is a list
 }

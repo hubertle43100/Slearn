@@ -14,21 +14,16 @@ import UIKit
 import RealmSwift
 
 class ToDoListViewController: UITableViewController {
-    
     //can rename by clicking with "command"
-    var todoItems: Results<Item>? //not an array but a result container
-   //var todoItems = [Item]()
+    var todoItems: Results<Item>? //collection of results that are item objects
+    
     let realm = try! Realm()
     
     var selectedCategory: Category? {
         didSet{ //triggers when there is a value for Category
-           // loadItems()
+            loadItems()
         }
     }
-    
-//    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-                    //^ singleton
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -37,9 +32,12 @@ class ToDoListViewController: UITableViewController {
     
     
     
-    //MARK: - TableviewDatasource Methods
+    
+    
+    //MARK: - Tableview Datasource Methods
+    //.reloadData() --> call this method
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return todoItems?.count ?? 1 //if nil then return 1
+        return todoItems?.count ?? 1 //if there is no item in list then return 1
     }
     
     //how we should display all of the cells
@@ -48,43 +46,30 @@ class ToDoListViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
         
         if let item = todoItems?[indexPath.row] { //this makes it shorter for everything that you do
-            //cell.textLabel?.text = itemArray[indexPath.row].title
-                   cell.textLabel?.text = item.title
+            
+                   cell.textLabel?.text = item.title //textLabel will be the same name current title for that item
                    
                    //turnary operator -->
                    //value = condition ? valueIfTrue : valueIfFalse
-                   cell.accessoryType = item.done ? .checkmark : .none
+            
+                   cell.accessoryType = item.done ? .checkmark : .none //checkmark given if item.done is true
         } else { //if item is nil
             cell.textLabel?.text = "no items added"
         }
-        
-//        //cell.textLabel?.text = itemArray[indexPath.row].title
-//        cell.textLabel?.text = item.title
-//
-//        //turnary operator -->
-//        value = condition ? valueIfTrue : valueIfFalse
-//        cell.accessoryType = item.done ? .checkmark : .none
-        
         return cell
     }
     
     
     
+    
+    
     //MARK: - TableView Delegates Methods
+    //when a cell has been selected --> call function
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //print(itemArray[indexPath.row])  -->  # row that was selected --> name selected
-        
-        // itemArray[indexPath.row].setValue("Completed", forKey: "title")
-//        todoItems?[indexPath.row].done = !todoItems[indexPath.row].done //this line replaces the if statement below
-//        saveItems()
-        
-        //tableView.reloadData() //forces the tableView to call data sources --> reload data
-        
-        if let item = todoItems?[indexPath.row] {
+        if let item = todoItems?[indexPath.row] { //grab the item in the current row
             do {
-                try realm.write {
-                    //realm.delete(item)
-                    item.done = !item.done
+                try realm.write { //updating value...
+                    item.done = !item.done //toggle (opposite) of item.done
                 }
             } catch {
                 print("Error saving done status, \(error)")
@@ -97,6 +82,8 @@ class ToDoListViewController: UITableViewController {
 
     
     
+    
+    
     //MARK: - Add New Items
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
@@ -107,14 +94,14 @@ class ToDoListViewController: UITableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             
             //commiting CRUD to our context --> persistent container
-            
-            if let currentCategory = self.selectedCategory {
+            if let currentCategory = self.selectedCategory { //check if selectedCategory is nil <-- optional?
                 do {
+                    //try to update the realm data
                     try self.realm.write { //saving...
-                        let newItem = Item() //create item
+                        let newItem = Item() //creating item...
                         newItem.title = textField.text! //give item a name
-                        newItem.dateCreated = Date()
-                        currentCategory.items.append(newItem) //add it to the list
+                        newItem.dateCreated = Date() //be the current date/time
+                        currentCategory.items.append(newItem) //add new item to the list
                     }
                 } catch {
                     print("Error saving new items, \(error)")
@@ -122,18 +109,6 @@ class ToDoListViewController: UITableViewController {
             }
             
             self.tableView.reloadData() //call data source methods and update them
-            
-//            let newItem = Item()
-//            newItem.title = textField.text!
-//           // newItem.done = false //it is not optional is needs a value
-//            newItem.parentCategory = self.selectedCategory
-//            self.itemArray.append(newItem)
-//
-//            self.saveItems()
-            
-            //only should be using defaults for small amount of data
-            //self.defaults.set(self.itemArray, forKey: "TodoListArray")
-            
         }
         
         //only triggers when someone adds something to their list
@@ -148,21 +123,15 @@ class ToDoListViewController: UITableViewController {
         
     }
     
-    //MARK: - Model Manipulation Methods
-//    func saveItems() {
-//        do {
-//            try context.save()
-//        } catch {
-//            print("Error saving context \(error)")
-//        }
-//
-//        self.tableView.reloadData()
-//    }
     
+    
+    
+    
+    
+    //MARK: - Model Manipulation Methods
     //has external and internal parameter
     func loadItems() {
-        
-        //looks at item and pulls it out in acending order
+        //loads all items and pulls it out in acending order
         todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
         
         tableView.reloadData()
@@ -171,17 +140,19 @@ class ToDoListViewController: UITableViewController {
 
 
 
+
+
 //MARK: - Search bar methods
 extension ToDoListViewController: UISearchBarDelegate { //help separate functionality
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) { //only triggers when "enter" button is pressed
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) { //only triggers when "enter"/"search" button is pressed
 
-        //query realm data...
-        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true) //todoItem is the word typed into the searchBar
+        //update our collection of items
+        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true) //todoItem is the word typed into the searchBar (ordered by date)
         
         tableView.reloadData()
     }
 
-    //this triggers when we dissmiss the search bar
+    //this triggers when we dissmiss the search bar (pressing 'x' when clearing search bar)
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchBar.text?.count == 0 { //when there is nothing in the searchBar
             loadItems()

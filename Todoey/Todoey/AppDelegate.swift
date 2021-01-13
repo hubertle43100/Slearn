@@ -19,54 +19,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         //print(Realm.Configuration.defaultConfiguration.fileURL)
         
-//        let data = Data()
-//        data.name = "HUBERT"
-//        data.age = 20
-        
         do {
-        //let realm = try Realm()
             _ = try Realm() //not using the variable so turned variable realm --> _
-//            try realm.write { //committing...
-//                realm.add(data)
-//            }
         } catch {
             print("Error initialising new realm, \(error)")
         }
         return true
     }
-    
-//    func applicationWillTerminate(_ application: UIApplication) {
-//        //print("applicationWillTerminate")
-//        self.saveContext()
-//    }
-
-    
-    
-//    // MARK: - Core Data stack
-//    //only triggers code when it is needed
-//    lazy var persistentContainer: NSPersistentContainer = {
-//        let container = NSPersistentContainer(name: "DataModel") //create Database here...
-//        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-//            if let error = error as NSError? {
-//                fatalError("Unresolved error \(error), \(error.userInfo)")
-//            }
-//        })
-//        return container
-//    }()
-//
-//
-//
-//    // MARK: - Core Data Saving support
-//    func saveContext () {
-//        let context = persistentContainer.viewContext //change data before commiting
-//        if context.hasChanges {
-//            do {
-//                try context.save()//commiting here
-//            } catch {
-//                let nserror = error as NSError
-//                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-//            }
-//        }
-//    }
 }
 

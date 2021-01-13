@@ -9,15 +9,12 @@
 import Foundation
 import RealmSwift
 
-//class Item: Object {
-//    @objc dynamic var title: String = ""
-//    @objc dynamic var done : Bool = false
-//    var parentCategory = LinkingObjects(fromType: Category.self, property: "items")
-//}
-
-class Item: Object {
+class Item: Object { //subclass of the Realm Object
+    //these are like labels for the items that are stored
     @objc dynamic var title: String = ""
     @objc dynamic var done: Bool = false
     @objc dynamic var dateCreated: Date?
+    
+    //inverse relationship which links the item to a parentCategory
     var parentCategory = LinkingObjects(fromType: Category.self, property: "items")
 }
