@@ -8,8 +8,9 @@
 
 import UIKit
 import RealmSwift
+//import SwipeCellKit
 
-class CategoryViewController: UITableViewController {
+class CategoryViewController: SwipeViewController {
              //try! == code smell (not an issue)
     let realm = try! Realm() //initlizing realm ...
     
@@ -19,6 +20,8 @@ class CategoryViewController: UITableViewController {
     override func viewDidLoad() { //first thing that happens when loading up the app
         super.viewDidLoad()
         loadCategories()
+        
+        tableView.rowHeight = 80.0 //chaning the size of the cell
     }
     
     
@@ -32,13 +35,24 @@ class CategoryViewController: UITableViewController {
         return categories?.count ?? 1 //NIL coalescing Operator (if nil then return 1)
     }
     
+//    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! SwipeTableViewCell
+//        cell.delegate = self
+//        return cell
+//    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
+        //initlize dequeueResusableCekk downcasting it as a SqipeTableViewCell
+        //let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) as! SwipeTableViewCell
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         //cell will look at location of cell if there is a category --> then fills up the cell (if NIL then print "")
         cell.textLabel?.text = categories?[indexPath.row].name ?? "No Category added yet"
         
+      //  cell.delegate = self //self == current ViewController
+        
         return cell
+        
     }
     
     
@@ -111,3 +125,4 @@ class CategoryViewController: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
 }
+//MARK: - Swipe Cell Delegate Methods
