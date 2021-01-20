@@ -8,6 +8,8 @@
 
 /*  SUPERCLASS MUST KNOW NOTHING FROM THE SUBCLASS */
 
+/* INDEXPATH - location of CELL */
+
 import UIKit
 import SwipeCellKit
 
@@ -15,7 +17,8 @@ class SwipeViewController: UITableViewController, SwipeTableViewCellDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        tableView.rowHeight = 80.0 //chaning the size of the cell
     }
     //TableView Datasource Methods
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -41,20 +44,8 @@ class SwipeViewController: UITableViewController, SwipeTableViewCellDelegate {
 
         let deleteAction = SwipeAction(style: .destructive, title: "Delete") { action, indexPath in
             // handle action by updating model with deletion
-            //print("Item deleted")
-            print("Delete Cell")
             
-//            if let categoryForDeletion = self.categories?[indexPath.row] { //dealing with an optional
-//                do {
-//                    try self.realm.write {
-//                        self.realm.delete(categoryForDeletion)
-//                    }
-//                } catch {
-//                    print("Error deleting category, \(error)")
-//                }
-//
-//               // tableView.reloadData()
-//            }
+            self.updateModel(at: indexPath)
         }
 
         // customize the action appearance
@@ -68,5 +59,11 @@ class SwipeViewController: UITableViewController, SwipeTableViewCellDelegate {
         options.expansionStyle = .destructive
         //options.transitionStyle = .border
         return options
+    }
+    
+    func updateModel(at indexPath: IndexPath) {
+        //Update data model...
+        
+        print("Item deleted from superclass")
     }
 }

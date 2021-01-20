@@ -20,8 +20,6 @@ class CategoryViewController: SwipeViewController {
     override func viewDidLoad() { //first thing that happens when loading up the app
         super.viewDidLoad()
         loadCategories()
-        
-        tableView.rowHeight = 80.0 //chaning the size of the cell
     }
     
     
@@ -79,6 +77,29 @@ class CategoryViewController: SwipeViewController {
     
     
     
+    
+    //MARK: - Delete Data From Swipe
+    //override and call superclass
+    override func updateModel(at indexPath: IndexPath) { //override ignore functionality of the superclass
+        
+        super.updateModel(at: indexPath) //accessing superclass? (calling superclass)
+        
+        //delegate method --> delete category from list
+        if let categoryForDeletion = self.categories?[indexPath.row] { //dealing with an optional
+            do {
+                try self.realm.write {
+                    self.realm.delete(categoryForDeletion)
+                }
+            } catch {
+                print("Error deleting category, \(error)")
+            }
+        }
+    }
+    
+    
+    
+    
+    
     //MARK: - Data Manipulation Methods
             //pass in the new category that just add using <-- 'addButtonPressed'
     func save(category: Category) {
@@ -125,4 +146,9 @@ class CategoryViewController: SwipeViewController {
         present(alert, animated: true, completion: nil)
     }
 }
+
+
+
+
+
 //MARK: - Swipe Cell Delegate Methods
