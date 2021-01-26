@@ -12,6 +12,7 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
 class ToDoListViewController: SwipeViewController {
     //can rename by clicking with "command"
@@ -49,7 +50,19 @@ class ToDoListViewController: SwipeViewController {
         if let item = todoItems?[indexPath.row] { //this makes it shorter for everything that you do
             
                    cell.textLabel?.text = item.title //textLabel will be the same name current title for that item
-                   
+            
+            if let colour = FlatPink().darken(byPercentage:
+            
+                //currently on row #5
+                //total 10 items
+                CGFloat(indexPath.row / todoItems!.count) //it's okay to '!' because it needs a definite color not nil
+            
+                ) {
+                cell.backgroundColor = colour
+            }
+
+            
+            //cell.backgroundColor =
                    //turnary operator -->
                    //value = condition ? valueIfTrue : valueIfFalse
             

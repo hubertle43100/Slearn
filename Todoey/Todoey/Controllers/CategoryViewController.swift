@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 //import SwipeCellKit
 
 class CategoryViewController: SwipeViewController {
@@ -20,6 +21,9 @@ class CategoryViewController: SwipeViewController {
     override func viewDidLoad() { //first thing that happens when loading up the app
         super.viewDidLoad()
         loadCategories()
+        
+        //color covers the entire cell
+        tableView.separatorStyle = .none
     }
     
     
@@ -44,10 +48,19 @@ class CategoryViewController: SwipeViewController {
         //let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) as! SwipeTableViewCell
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
+        if let category = categories?[indexPath.row] {
+            cell.textLabel?.text = category.name ?? "No Category added yet"
+            cell.backgroundColor = UIColor(hexString: category.colour ?? "1D9BF6")
+        }
+        
+        
         //cell will look at location of cell if there is a category --> then fills up the cell (if NIL then print "")
-        cell.textLabel?.text = categories?[indexPath.row].name ?? "No Category added yet"
+        //cell.textLabel?.text = categories?[indexPath.row].name ?? "No Category added yet"
         
       //  cell.delegate = self //self == current ViewController
+        
+        //cell.backgroundColor = UIColor.randomFlat()
+        //cell.backgroundColor = UIColor(hexString: categories?[indexPath.row].colour ?? "1D9BF6")//
         
         return cell
         
@@ -134,6 +147,9 @@ class CategoryViewController: SwipeViewController {
         let action = UIAlertAction(title: "Add", style: .default) { (action) in //if 'add' button is pressed in alert then -->
             let newCategory = Category() //Category is straight up object
             newCategory.name = textField.text! //text in UIAlert
+            
+            newCategory.colour = UIColor.randomFlat().hexValue()
+            
             self.save(category: newCategory)
         }
         alert.addAction(action)

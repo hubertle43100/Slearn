@@ -12,5 +12,6 @@ import RealmSwift
 class Category: Object { //subclass of the Realm Object
     //dynamic fits into runtime/buildtime
     @objc dynamic var name: String = ""
+    @objc dynamic var colour: String = ""
     let items = List<Item>() //category has an item which is a list
 }
