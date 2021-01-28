@@ -20,15 +20,41 @@ class ToDoListViewController: SwipeViewController {
     
     let realm = try! Realm()
     
+    @IBOutlet weak var searchBar: UISearchBar!
     var selectedCategory: Category? {
         didSet{ //triggers when there is a value for Category
             loadItems()
         }
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)) //path where data is stored
+       // print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)) //path where data is stored
+        
+        tableView.separatorStyle = .none //gets rid of the cell line dividers
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        if let colourHex = selectedCategory?.colour {
+            
+            title = selectedCategory!.name
+            
+            guard let navBar = navigationController?.navigationBar else {
+                fatalError("navigation controller does not exist.")
+            }
+            
+            if let navBarColour = UIColor(hexString: colourHex) {
+                navBar.barTintColor = navBarColour
+                
+                navBar.tintColor = ContrastColorOf(navBarColour, returnFlat: true)
+                
+                navBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: ContrastColorOf(navBarColour, returnFlat: true)]
+                
+                searchBar.barTintColor = navBarColour
+            }
+        }
     }
     
     
@@ -51,16 +77,22 @@ class ToDoListViewController: SwipeViewController {
             
                    cell.textLabel?.text = item.title //textLabel will be the same name current title for that item
             
-            if let colour = FlatPink().darken(byPercentage:
+                                    //make sure there is a selected colour before we move on ('?')
+            if let colour = UIColor(hexString: selectedCategory!.colour)?.darken(byPercentage:
             
                 //currently on row #5
                 //total 10 items
-                CGFloat(indexPath.row / todoItems!.count) //it's okay to '!' because it needs a definite color not nil
-            
+                //CGFloat(indexPath.row / todoItems!.count) //it's okay to '!' because it needs a definite color not nil
+                CGFloat(indexPath.row) / CGFloat(todoItems!.count)
                 ) {
                 cell.backgroundColor = colour
+                cell.textLabel?.textColor = ContrastColorOf(colour, returnFlat: true)
             }
 
+           // print("version 1: \(CGFloat(indexPath.row / todoItems!.count))") //whole # divided by whole #
+           // CGFloat(indexPath.row) / CGFloat(todoItems!.count)
+            
+            //print("version 2: \(CGFloat(indexPath.row) / CGFloat(todoItems!.count))") //CGFloat is divided by CGFloat
             
             //cell.backgroundColor =
                    //turnary operator -->
