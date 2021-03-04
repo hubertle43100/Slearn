@@ -2,7 +2,24 @@ import UIKit
 
 /* computed properties makes the code dynamic, not have to change alot and makes it easier in general */
 
-let pizzaInInches: Int = 16
+var pizzaInInches: Int = 10 { //observed property to observe when value has been changed
+    willSet { //before changes
+//        print(pizzaInInches) //access to the oldValue
+//        print(newValue)
+    }
+    didSet { //after changes
+//        print(oldValue)
+//        print(pizzaInInches) //access the newValue
+        if pizzaInInches >= 18 {
+            print("Ivalid size specified, pizzaInInches set to 18.")
+            pizzaInInches = 18
+        }
+    }
+}
+
+pizzaInInches = 33
+print(pizzaInInches)
+
 var numberOfPeople: Int = 12
 let slicesPerPerson: Int = 4
 
